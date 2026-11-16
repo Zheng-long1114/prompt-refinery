@@ -1,0 +1,8 @@
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# local installs / backups
+*.bak-*
+node_modules/
