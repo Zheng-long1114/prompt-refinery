@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > 曖昧な一行の指示でも、**追加の質問を一度もすることなく**そのまま受け取って実行できる実行仕様に変えます。
 
 ポータブルなエージェントスキルです（DSH / Claude Code / Codex など互換ランナーに対応）。すべてのリクエストは **refine → audit → ask → loop** の4段階を通り、その直後に作業が始まります。プロンプトテンプレート集ではなく、**品質ゲートを備えたパイプライン**です。
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 スキルのルートは監視されているため**再起動は不要**です。新しいセッションでは `<available_skills>` に表示されます。手動で呼び出す場合は、コンポーザーに `/prompt-refinery` と入力します。
 
-### その他のランナー
+### 他のエージェント
 
-そのランナーのスキルディレクトリに `SKILL.md` と `references/` を置きます(Claude Code: `~/.claude/skills/`; Codex: そのスキルルート)。ワークフローとプリアンブルはプラットフォームに依存せず、必要な能力は3つだけです。**サブエージェントの起動、ユーザーへの質問、ファイルの読み書き**。
+本スキルはランナー非依存です。必要なのは三つだけ——**サブエージェントの起動、ユーザーへの質問、ファイルの読み書き**。ネイティブなスキル機構がない場合は、そのランナーの指示ファイルに一行のポインタを足すだけです。
 
----
+| エージェント | インストール先 | 起動方法 |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+各ランナーの詳細手順は [docs/integrations.md](docs/integrations.md)。
+
 
 ## 実際の姿
 
@@ -127,6 +145,7 @@ R1 ソース絶対 · R2 スコープ拡大なし · R3 阻害するギャップ
 .
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/
 │   ├── preamble.md              # P1 refiner / P2 auditor / P3 executor preambles

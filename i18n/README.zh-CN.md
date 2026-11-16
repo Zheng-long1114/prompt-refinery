@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > 把任何一句模糊的提示词，变成一份**拿起来就能照着做、不需要再问任何问题**的执行规格。
 
 一个可移植的 agent skill（DSH / Claude Code / Codex 等兼容 runner）：每条请求先过 **精炼 → 审计 → 追问 → 循环** 四道工序，达标后立刻开工。不是提示词模板库，是一条**带质量门槛的流水线**。
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 技能根被 DSH 监听，**不需要重启**；新会话的 `<available_skills>` 里即可看到。手动调用：输入框键入 `/prompt-refinery`。
 
-### 其他 runner
+### 其他 Agent
 
-把 `SKILL.md` 与 `references/` 放进该 runner 的技能目录即可（Claude Code: `~/.claude/skills/`；Codex: 其 skill 根）。核心流程与前置词与平台无关，只依赖三个能力：**派子智能体、问用户、读写文件**。
+本 skill 与 runner 无关：只需要三种能力——**派子智能体、向用户提问、读写文件**。若某个 runner 没有原生 skill 支持，在它的指令文件里加一行指针即可。
 
----
+| Agent | 安装位置 | 触发方式 |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+每个 runner 的完整步骤见 [docs/integrations.zh-CN.md](docs/integrations.zh-CN.md)。
+
 
 ## 它长什么样
 
@@ -125,6 +143,7 @@ R1 原文主权 · R2 不加戏 · R3 只问阻塞 · R4 提问预算（单轮 �
 .
 ├── README.md                    # 英文主文档
 ├── i18n/                        # 各语言翻译（zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi）
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # 主流程：触发契约 / 状态机 / 派发 / 审计 / 交接 / 规则
 ├── references/
 │   ├── preamble.md              # P1 精炼者 / P2 审计者 / P3 执行者 三套前置词
@@ -218,4 +237,6 @@ node scripts/validate.mjs .          # 校验 frontmatter / 引用 / 命名规�
 
 ## License
 
-MIT
+以 [MIT 许可证](LICENSE) 发布：可商用、可修改、可再分发，保留版权声明与许可声明即可。
+
+Copyright (c) 2026 YG

@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > Verwandle jedes noch so vage Ein-Satz-Briefing in eine Ausführungsspezifikation, die man aufgreifen und befolgen kann, **ohne eine einzige Rückfrage zu stellen**.
 
 Ein portabler Agent-Skill (DSH / Claude Code / Codex und andere kompatible Runner): Jede Anfrage durchläuft vier Stufen — **verfeinern → prüfen → nachfragen → iterieren** — danach beginnt die Arbeit sofort. Es ist keine Sammlung von Prompt-Vorlagen, sondern eine **Pipeline mit Qualitätsgate**.
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 Der Skill-Root wird überwacht, ein **Neustart ist also nicht nötig**; neue Sitzungen führen den Skill in `<available_skills>` auf. Manueller Aufruf: `/prompt-refinery` in die Eingabezeile tippen.
 
-### Andere Runner
+### Weitere Agenten
 
-`SKILL.md` und `references/` in das Skill-Verzeichnis des jeweiligen Runners legen (Claude Code: `~/.claude/skills/`; Codex: dessen Skill-Root). Der Workflow und die Präambeln sind plattformneutral — sie brauchen nur drei Fähigkeiten: **Subagents starten, den Nutzer fragen, Dateien lesen und schreiben**.
+Der Skill ist runner-neutral: Er braucht nur drei Fähigkeiten — **Subagenten starten, den Nutzer fragen, Dateien lesen und schreiben**. Fehlt einem Runner native Skill-Unterstützung, genügt eine Zeigerzeile in seiner Instruktionsdatei.
 
----
+| Agent | Installationsort | Auslösung |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+Vollständige Schritte je Runner: [docs/integrations.md](docs/integrations.md).
+
 
 ## Wie es aussieht
 
@@ -127,6 +145,7 @@ R1 Vorrang der Quelle · R2 kein Scope Creep · R3 nur blockierende Lücken erfr
 .
 ├── README.md                    # diese Datei (Englisch)
 ├── i18n/                        # Übersetzungen (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # Hauptablauf: Trigger / Zustandsmaschine / Dispatch / Audit / Handoff / Regeln
 ├── references/
 │   ├── preamble.md              # Präambeln P1 Refiner / P2 Auditor / P3 Executor

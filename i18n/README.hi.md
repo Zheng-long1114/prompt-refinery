@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > किसी भी अस्पष्ट एक-पंक्ति के अनुरोध को ऐसी निष्पादन-विनिर्देश में बदलें जिसे आप उठाकर **एक भी अनुवर्ती सवाल पूछे बिना** आगे बढ़ा सकें।
 
 एक पोर्टेबल एजेंट स्किल (DSH / Claude Code / Codex तथा अन्य संगत रनर): हर अनुरोध चार चरणों से गुज़रता है — **परिष्करण → ऑडिट → प्रश्न → पुनरावृत्ति** — और उसके बाद काम तुरंत शुरू हो जाता है। यह प्रॉम्प्ट टेम्पलेटों का संग्रह नहीं है; यह **गुणवत्ता-द्वार वाली एक पाइपलाइन** है।
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 स्किल्स रूट पर निगरानी रहती है, इसलिए **पुनः आरंभ की आवश्यकता नहीं**; नए सत्र इसे `<available_skills>` में सूचीबद्ध करते हैं। मैन्युअल रूप से चलाने के लिए: इनपुट बॉक्स में `/prompt-refinery` टाइप करें।
 
-### अन्य रनर
+### अन्य एजेंट
 
-`SKILL.md` और `references/` को उस रनर की स्किल निर्देशिका में रखें (Claude Code: `~/.claude/skills/`; Codex: उसका स्किल रूट)। वर्कफ़्लो और प्रीएंबल प्लेटफ़ॉर्म-निरपेक्ष हैं — उन्हें केवल तीन क्षमताएँ चाहिए: **सबएजेंट बनाना, उपयोगकर्ता से पूछना, फ़ाइलें पढ़ना और लिखना**।
+यह स्किल रनर-निरपेक्ष है: इसे केवल तीन क्षमताएँ चाहिए — **सबएजेंट चलाना, उपयोगकर्ता से पूछना, फ़ाइलें पढ़ना और लिखना**। यदि किसी रनर में मूल स्किल समर्थन नहीं है, तो उसकी निर्देश फ़ाइल में एक पंक्ति का संकेत जोड़ दें।
 
----
+| एजेंट | कहाँ इंस्टॉल करें | कैसे ट्रिगर होता है |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+प्रत्येक रनर के पूरे चरण: [docs/integrations.md](docs/integrations.md)।
+
 
 ## यह काम करते हुए कैसा दिखता है
 
@@ -127,6 +145,7 @@ R1 स्रोत की सर्वोच्चता · R2 स्कोप �
 .
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/
 │   ├── preamble.md              # P1 refiner / P2 auditor / P3 executor preambles

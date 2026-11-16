@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > 把任何一句模糊的單行需求，變成一份**拿起來就能照著做、不必再追問任何問題**的執行規格。
 
 一套可攜式的 agent skill（DSH / Claude Code / Codex 及其他相容 runner）：每一則請求都會先經過 **精煉 → 稽核 → 追問 → 迴圈** 四道關卡，通過後立刻開工。它不是提示詞範本庫，而是一條**帶品質門檻的流水線**。
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 技能根目錄會被監看，因此**不需要重新啟動**；新的工作階段就會在 `<available_skills>` 中列出它。手動呼叫：在輸入框輸入 `/prompt-refinery`。
 
-### 其他 runner
+### 其他 Agent
 
-把 `SKILL.md` 與 `references/` 放進該 runner 的技能目錄（Claude Code：`~/.claude/skills/`；Codex：其 skill 根目錄）。整體流程與前置詞與平台無關——只依賴三項能力：**啟動子智能體、向使用者提問、讀寫檔案**。
+本 skill 與 runner 無關：只需要三種能力——**派子智慧體、向使用者提問、讀寫檔案**。若某個 runner 沒有原生 skill 支援，在它的指令檔案加一行指標即可。
 
----
+| Agent | 安裝位置 | 觸發方式 |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+每個 runner 的完整步驟見 [docs/integrations.zh-CN.md](docs/integrations.zh-CN.md)。
+
 
 ## 它長什麼樣子
 
@@ -126,6 +144,7 @@ R1 原文至上 · R2 不得範圍蔓延 · R3 只問阻塞性缺口 · R4 提�
 .
 ├── README.md                    # 本檔案（英文）
 ├── i18n/                        # 各語言譯本（zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi）
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # 主流程：觸發條件 / 狀態機 / 派發 / 稽核 / 交接 / 規則
 ├── references/
 │   ├── preamble.md              # P1 精煉者 / P2 稽核者 / P3 執行者 前置詞

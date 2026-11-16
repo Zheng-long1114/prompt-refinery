@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > Transformez n'importe quelle phrase vague d'une seule ligne en une spécification d'exécution que vous pouvez reprendre et suivre **sans poser une seule question de suivi**.
 
 Une skill d'agent portable (DSH / Claude Code / Codex et autres exécuteurs compatibles) : chaque demande passe par quatre étapes — **affiner → auditer → demander → boucler** — puis le travail démarre immédiatement. Ce n'est pas une bibliothèque de modèles de prompts, c'est un **pipeline doté d'une porte qualité**.
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 La racine des skills est surveillée : **aucun redémarrage n'est nécessaire** ; les nouvelles sessions la listent dans `<available_skills>`. Invocation manuelle : saisissez `/prompt-refinery` dans la zone de saisie.
 
-### Autres exécuteurs
+### Autres agents
 
-Déposez `SKILL.md` et `references/` dans le répertoire de skills de cet exécuteur (Claude Code : `~/.claude/skills/` ; Codex : sa racine de skills). Le déroulé et les préambules sont neutres vis-à-vis de la plateforme : trois capacités suffisent — **lancer des sous-agents, interroger l'utilisateur, lire et écrire des fichiers**.
+La skill est indépendante du runner : elle ne requiert que trois capacités — **lancer des sous-agents, interroger l’utilisateur, lire et écrire des fichiers**. Si un runner n’a pas de support natif, ajoutez une ligne de pointeur dans son fichier d’instructions.
 
----
+| Agent | Où installer | Comment il se déclenche |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+Étapes détaillées par runner : [docs/integrations.md](docs/integrations.md).
+
 
 ## À quoi cela ressemble
 
@@ -127,6 +145,7 @@ R1 primauté de la source · R2 pas de dérive du périmètre · R3 ne poser que
 .
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/
 │   ├── preamble.md              # P1 refiner / P2 auditor / P3 executor preambles

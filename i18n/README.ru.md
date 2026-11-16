@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > Превращает любую расплывчатую однострочную задачу в спецификацию, по которой можно взяться за работу **без единого уточняющего вопроса**.
 
 Переносимый навык агента (DSH / Claude Code / Codex и другие совместимые раннеры): каждый запрос проходит четыре стадии — **уточнение → аудит → вопросы → цикл** — после чего работа начинается сразу. Это не библиотека шаблонов промптов, а **конвейер с воротами качества**.
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 Корневой каталог навыков отслеживается, поэтому **перезапуск не нужен**; новые сеансы увидят его в `<available_skills>`. Ручной вызов: введите `/prompt-refinery` в поле ввода.
 
-### Другие раннеры
+### Другие агенты
 
-Скопируйте `SKILL.md` и `references/` в каталог навыков соответствующего раннера (Claude Code: `~/.claude/skills/`; Codex: его корень навыков). Рабочий процесс и преамбулы не зависят от платформы — нужны всего три возможности: **порождать субагентов, задавать вопросы пользователю, читать и записывать файлы**.
+Навык не зависит от раннера: нужны всего три возможности — **запуск субагента, вопрос пользователю, чтение и запись файлов**. Если раннер не поддерживает навыки нативно, достаточно одной строки-указателя в его файле инструкций.
 
----
+| Агент | Куда устанавливать | Как срабатывает |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+Полные шаги по каждому раннеру: [docs/integrations.md](docs/integrations.md).
+
 
 ## Как это выглядит
 
@@ -129,6 +147,7 @@ R1 верховенство исходника · R2 никакого распо
 .
 ├── README.md                    # этот файл (английский)
 ├── i18n/                        # переводы (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # основной процесс: триггеры / конечный автомат / диспетчеризация / аудит / передача / правила
 ├── references/
 │   ├── preamble.md              # преамбулы P1 уточнителя / P2 аудитора / P3 исполнителя

@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 <div dir="rtl">
 
 > حوّل أي طلب غامض من سطر واحد إلى مواصفة تنفيذ يمكنك التقاطها والمضي قدمًا بها **دون طرح أي سؤال متابعة واحد**.
@@ -53,11 +55,27 @@ bash scripts/install.sh
 
 مجلد المهارات الجذري مراقَب، لذا **لا حاجة إلى إعادة تشغيل**؛ وستُدرجه الجلسات الجديدة في `<available_skills>`. للاستدعاء اليدوي: اكتب `/prompt-refinery` في حقل الكتابة.
 
-### مشغّلات أخرى
+### وكلاء آخرون
 
-ضع `SKILL.md` و`references/` في مجلد المهارات الخاص بذلك المشغّل (Claude Code: `~/.claude/skills/`؛ Codex: جذر المهارات لديه). سير العمل والمقدمات محايدة تجاه المنصّة — لا تحتاج سوى ثلاث قدرات: **إنشاء وكلاء فرعيين، وسؤال المستخدم، وقراءة الملفات وكتابتها**.
+هذه المهارة مستقلة عن المشغّل: تحتاج إلى ثلاث قدرات فقط — **تشغيل وكيل فرعي، سؤال المستخدم، وقراءة الملفات وكتابتها**. وإذا لم يدعم المشغّل المهارات أصلاً، أضف سطر إشارة واحدًا إلى ملف تعليماته.
 
----
+| الوكيل | موضع التثبيت | طريقة التفعيل |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+الخطوات الكاملة لكل مشغّل: [docs/integrations.md](docs/integrations.md).
+
 
 ## كيف يبدو في العمل
 
@@ -129,6 +147,7 @@ R1 أولوية المصدر · R2 لا توسّع في النطاق · R3 اس�
 .
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/
 │   ├── preamble.md              # P1 refiner / P2 auditor / P3 executor preambles

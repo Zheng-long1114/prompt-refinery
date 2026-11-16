@@ -2,6 +2,8 @@
 
 **🌐** [English](../README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [العربية](README.ar.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [हिन्दी](README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > 모호한 한 줄짜리 지시도 **추가 질문을 단 한 번도 하지 않고** 그대로 집어 들어 실행할 수 있는 실행 명세로 바꿉니다.
 
 휴대 가능한 에이전트 스킬입니다(DSH / Claude Code / Codex 및 기타 호환 러너). 모든 요청은 **refine → audit → ask → loop** 네 단계를 거친 뒤 곧바로 작업이 시작됩니다. 프롬프트 템플릿 모음이 아니라 **품질 게이트를 갖춘 파이프라인**입니다.
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 스킬 루트를 감시하므로 **재시작이 필요 없습니다**. 새 세션에서는 `<available_skills>`에 표시됩니다. 수동 호출은 컴포저에 `/prompt-refinery`를 입력합니다.
 
-### 다른 러너
+### 다른 에이전트
 
-해당 러너의 스킬 디렉터리에 `SKILL.md`와 `references/`를 넣습니다(Claude Code: `~/.claude/skills/`; Codex: 해당 스킬 루트). 워크플로와 프리앰블은 플랫폼 중립적이며, 필요한 능력은 세 가지뿐입니다. **서브에이전트 생성, 사용자에게 질문, 파일 읽기와 쓰기**.
+이 스킬은 러너에 독립적입니다. 필요한 능력은 세 가지뿐입니다 — **서브에이전트 실행, 사용자에게 질문, 파일 읽기·쓰기**. 네이티브 스킬 지원이 없는 러너라면 지시 파일에 한 줄 포인터만 추가하면 됩니다.
 
----
+| 에이전트 | 설치 위치 | 트리거 방식 |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+러너별 전체 절차는 [docs/integrations.md](docs/integrations.md) 참고.
+
 
 ## 실제 모습
 
@@ -127,6 +145,7 @@ R1 소스 절대 · R2 범위 확장 금지 · R3 막는 갭만 질문 · R4 질
 .
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/
 │   ├── preamble.md              # P1 refiner / P2 auditor / P3 executor preambles

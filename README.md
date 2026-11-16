@@ -2,6 +2,8 @@
 
 **🌐** [English](README.md) · [简体中文](i18n/README.zh-CN.md) · [繁體中文](i18n/README.zh-TW.md) · [日本語](i18n/README.ja.md) · [한국어](i18n/README.ko.md) · [العربية](i18n/README.ar.md) · [Español](i18n/README.es.md) · [Français](i18n/README.fr.md) · [Deutsch](i18n/README.de.md) · [Português](i18n/README.pt-BR.md) · [Русский](i18n/README.ru.md) · [हिन्दी](i18n/README.hi.md)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
+
 > Turn any vague one-liner into an execution spec you can pick up and follow **without asking a single follow-up question**.
 
 A portable agent skill (DSH / Claude Code / Codex and other compatible runners): every request passes through four stages — **refine → audit → ask → loop** — and then work starts immediately. It is not a prompt template library; it is a **pipeline with a quality gate**.
@@ -51,11 +53,27 @@ bash scripts/install.sh
 
 The skills root is watched, so **no restart is needed**; new sessions list it in `<available_skills>`. Manual invoke: type `/prompt-refinery` in the composer.
 
-### Other runners
+### Other agents
 
-Drop `SKILL.md` and `references/` into that runner's skill directory (Claude Code: `~/.claude/skills/`; Codex: its skill root). The workflow and preambles are platform-neutral — they need only three capabilities: **spawn subagents, ask the user, read and write files**.
+The skill is runner-neutral: it needs only three capabilities — **spawn subagents, ask the user, read and write files**. Where a runner has no native skill support, add a one-line pointer to its instruction file.
 
----
+| Agent | Where to install | How it triggers |
+| --- | --- | --- |
+| DSH (DeepSeek Harness) | `$DSH_HOME/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Claude Code | `~/.claude/skills/prompt-refinery` | auto + `/prompt-refinery` |
+| Codex CLI | `~/.codex/prompt-refinery` + `AGENTS.md` | instruction file |
+| Cursor | `.cursor/rules/prompt-refinery.mdc` | `alwaysApply: true` |
+| Windsurf | `.windsurf/rules/prompt-refinery.md` | `trigger: always_on` |
+| Cline / Roo Code | `.clinerules/prompt-refinery.md` | always on |
+| GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
+| Gemini CLI | `GEMINI.md` + bundle | instruction file |
+| Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
+| Continue | .continue/rules/prompt-refinery.md | auto |
+| opencode | `AGENTS.md` | instruction file |
+| Any other runner | anywhere readable | one pointer line |
+
+Full step-by-step for each runner: [docs/integrations.md](docs/integrations.md).
+
 
 ## What it looks like
 
@@ -127,6 +145,7 @@ R1 source supremacy · R2 no scope creep · R3 ask only blocking gaps · R4 ques
 .
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
+├── docs/                        # per-runner integration guides (en, zh-CN)
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/
 │   ├── preamble.md              # P1 refiner / P2 auditor / P3 executor preambles
@@ -222,4 +241,6 @@ Translations keep commands, code blocks, file paths and skill identifiers in the
 
 ## License
 
-MIT
+Released under the [MIT License](LICENSE) — free to use, modify and redistribute, including commercially; keep the copyright and permission notice.
+
+Copyright (c) 2026 YG
