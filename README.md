@@ -1,26 +1,67 @@
+<div align="center">
+
 # prompt-refinery
+
+**提示词精炼厂** · *Prompt Refinery*
+
+<sub>Turn any vague one-liner into an execution spec you can follow without asking a single follow-up question.</sub>
+
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+<a href="docs/integrations.md"><img src="https://img.shields.io/badge/agents-11%20runners-blue.svg" alt="Supported agents" /></a>
+<a href="docs/chat-apps.md"><img src="https://img.shields.io/badge/chat%20apps-Doubao%20%C2%B7%20Qwen%20%C2%B7%20Kimi%20%C2%B7%20more-purple.svg" alt="Chat apps" /></a>
+<a href="i18n/"><img src="https://img.shields.io/badge/i18n-12%20languages-green.svg" alt="Translations" /></a>
 
 **🌐** [English](README.md) · [简体中文](i18n/README.zh-CN.md) · [繁體中文](i18n/README.zh-TW.md) · [日本語](i18n/README.ja.md) · [한국어](i18n/README.ko.md) · [العربية](i18n/README.ar.md) · [Español](i18n/README.es.md) · [Français](i18n/README.fr.md) · [Deutsch](i18n/README.de.md) · [Português](i18n/README.pt-BR.md) · [Русский](i18n/README.ru.md) · [हिन्दी](i18n/README.hi.md)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Agents](https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor%20%C2%B7%20more-blue.svg)](docs/integrations.md)
-
-> Turn any vague one-liner into an execution spec you can pick up and follow **without asking a single follow-up question**.
-
-A portable agent skill (DSH / Claude Code / Codex and other compatible runners): every request passes through four stages — **refine → audit → ask → loop** — and then work starts immediately. It is not a prompt template library; it is a **pipeline with a quality gate**.
-
-```
-any prompt → CAPTURE (inspect the environment yourself) → REFINE (refiner subagent)
-           → AUDIT (auditor subagent × 100-point scorecard)
-           → blocking gaps → ask once (≤4 questions, options + defaults) → refill and loop
-           → not detailed enough → patch only, score must not drop, ≤4 rounds
-           → PASS (≥85 and every dimension ≥60%) → HANDOFF → work starts in the same turn
-```
+</div>
 
 ---
 
-## Why it exists
+> **The problem is never "the model can't write".** It is that it guesses when your input is thin, and keeps confirming when your input is rich.
+>
+> This skill fixes both: **score the spec before you spend tokens on the work.**
 
-Models do not lack writing ability. They lack two things: **asking the right question when your input is insufficient**, and **getting it right the first time when it is sufficient**. Real conversations fail in only two shapes:
+```mermaid
+flowchart LR
+    A([Any prompt]) --> B["CAPTURE<br/><sub>read the workspace first</sub>"]
+    B --> C["REFINE<br/><sub>refiner subagent</sub>"]
+    C --> D["AUDIT<br/><sub>100-point scorecard</sub>"]
+    D -->|PASS ≥ 85| G["HANDOFF<br/><sub>work starts this turn</sub>"]
+    D -->|"blocking gaps"| E["ASK once<br/><sub>≤4 questions, with defaults</sub>"]
+    D -->|"too coarse"| F["PATCH loop<br/><sub>≤4 rounds</sub>"]
+    E --> C
+    F --> D
+    G --> H([Artifact])
+```
+
+<details>
+<summary><b>📑 Table of contents</b></summary>
+
+- [Why this exists](#why-this-exists)
+- [Quick start](#quick-start)
+  - [One-line install (DSH)](#one-line-install-dsh)
+  - [Other agents](#other-agents)
+- [Chat apps (Doubao, Qwen, Kimi, …)](#chat-apps-doubao-qwen-kimi-)
+- [How it works](#how-it-works)
+  - [Ten-dimension scorecard](#ten-dimension-scorecard)
+  - [The 10-block spec](#the-10-block-spec)
+  - [Preamble excerpt](#preamble-excerpt)
+- [The 12 hard rules](#the-12-hard-rules)
+- [Output quotas](#output-quotas)
+- [Repository layout](#repository-layout)
+- [Example output](#example-output)
+- [Anti-patterns](#anti-patterns)
+- [Validate](#validate)
+- [Translations](#translations)
+- [License](#license)
+
+</details>
+
+---
+
+## Why this exists
+
+Models do not lack writing ability. They lack two things: **asking the right question when your input is insufficient**, and **getting it right the first time when it is sufficient**.
 
 | Symptom | Root cause | What this skill does |
 | --- | --- | --- |
@@ -33,25 +74,22 @@ Models do not lack writing ability. They lack two things: **asking the right que
 
 ## Quick start
 
-### Install as a DSH skill (user level, global)
+### One-line install (DSH)
 
 ```bash
 git clone https://github.com/Zheng-long1114/prompt-refinery.git ~/.dsh/skills/prompt-refinery
 ```
 
-Or use the scripts (idempotent, validated, backs up the previous copy):
+Or with backup + validation:
 
 ```powershell
-# Windows
-pwsh -File scripts/install.ps1
+pwsh -File scripts/install.ps1        # Windows
 ```
-
 ```bash
-# macOS / Linux / WSL
-bash scripts/install.sh
+bash scripts/install.sh               # macOS / Linux / WSL
 ```
 
-The skills root is watched, so **no restart is needed**; new sessions list it in `<available_skills>`. Manual invoke: type `/prompt-refinery` in the composer.
+The skills root is watched, so **no restart is needed**; new sessions list it in `<available_skills>`. Manual invoke: type `/prompt-refinery`.
 
 ### Other agents
 
@@ -68,16 +106,46 @@ The skill is runner-neutral: it needs only three capabilities — **spawn subage
 | GitHub Copilot | `.github/instructions/prompt-refinery.instructions.md` | `applyTo: "**"` |
 | Gemini CLI | `GEMINI.md` + bundle | instruction file |
 | Aider | `CONVENTIONS.md` | `--read CONVENTIONS.md` |
-| Continue | .continue/rules/prompt-refinery.md | auto |
+| Continue | `.continue/rules/prompt-refinery.md` | auto |
 | opencode | `AGENTS.md` | instruction file |
 | Any other runner | anywhere readable | one pointer line |
 
 Full step-by-step for each runner: [docs/integrations.md](docs/integrations.md).
 
+---
 
-## What it looks like
+## Chat apps (Doubao, Qwen, Kimi, …)
 
-### Ten-dimension scorecard (PASS ≥ 85, every dimension ≥ 60% of its weight)
+Chat and office assistants — 豆包, 千问/Qwen, Kimi, 腾讯元宝, 文心一言, 讯飞星火, DeepSeek, WPS AI, 飞书, 钉钉 — have no skill directory, no subagents and no disk access. They get the **single-file edition**: one prompt pasted into an agent / custom-instruction field.
+
+```text
+prompts/chat-mode.en.md      # English
+prompts/chat-mode.zh-CN.md   # 中文
+```
+
+| App | Where to paste |
+| --- | --- |
+| 豆包 Doubao | 智能体 → 创建 → 角色设定 |
+| 千问 Qwen | 智能体 → 创建 → 指令 / 提示词 |
+| Kimi | Kimi+ 智能体提示词，或上传 txt 让模型按文件工作 |
+| 腾讯元宝 | 创建智能体 → 设定 |
+| 文心一言 | 创建智能体 → 人设与回复逻辑 |
+| 讯飞星火 | 星火智能体 → 角色描述 |
+| DeepSeek | 无自定义入口：每次开场粘贴 |
+| WPS AI | 文档侧边栏对话开场粘贴 |
+| 飞书 / 钉钉 | 智能伙伴 / AI 助理 → 角色设定 |
+
+Per-app clicks, pitfalls and an acceptance test: **[docs/chat-apps.md](docs/chat-apps.md)** · [中文版](docs/chat-apps.zh-CN.md).
+
+---
+
+## How it works
+
+Every request walks the same path. Nothing is optional; the gates are what make it work.
+
+### Ten-dimension scorecard
+
+PASS requires **≥ 85 total** *and* **every dimension ≥ 60% of its weight**.
 
 | # | Dimension | Weight | Typical deduction |
 | --- | --- | --- | --- |
@@ -92,17 +160,17 @@ Full step-by-step for each runner: [docs/integrations.md](docs/integrations.md).
 | D9 | Explicit assumptions | 5 | Assumptions buried in prose |
 | D10 | Executability and tools | 3 | Requires unavailable capabilities |
 
-Three mandatory tests: **cold-read** (can a context-free executor work without asking?), **acceptance** (can you list what "done correctly" means?), **scope creep** (does the spec contain goals the user never stated?).
+Three mandatory tests: **cold read** (can a context-free executor work without asking?), **acceptance** (can you list what "done correctly" means?), **scope creep** (does the spec contain goals the user never stated?).
 
-### The 10-block execution spec (SPEC)
+### The 10-block spec
 
 `Goal / Deliverables / Audience and tone / Inputs and evidence / Boundaries and prohibitions / Steps / Output specification / Quality and acceptance / Assumptions and open items / Optional extras`
 
 No block may be left empty (write "not applicable + reason" instead), and `TBD`, "maybe", "depends" are forbidden.
 
-### Preamble (excerpt)
+### Preamble excerpt
 
-```
+```text
 [ROLE] You are the Prompt Refiner. You do not execute the task; you turn a rough
        prompt into a spec that can be followed without asking anything.
 [Ban 1] Do not load or trigger prompt-refinery, do not spawn subagents,
@@ -118,11 +186,24 @@ Ban 4 is not optional: subagents also see the skill catalog ("load FIRST for any
 
 ---
 
-## The 12 hard rules (summary)
+## The 12 hard rules
 
-R1 source supremacy · R2 no scope creep · R3 ask only blocking gaps · R4 question budget (≤4 per round, ≤2 rounds per session) · R5 independent audit (auditor ≠ refiner) · R6 never change the task's nature · R7 intent fidelity · R8 follow the user's language · R9 round cap (≤4) · R10 execute on PASS · R11 no recursion · R12 silent execution
+| Rule | Meaning |
+| --- | --- |
+| R1 | Source supremacy — every hard requirement in the original prompt maps to a block |
+| R2 | No scope creep — only resolution is added, never new goals |
+| R3 | Ask only blocking gaps — anything inferable becomes an assumption |
+| R4 | Question budget — ≤4 per round, ≤2 rounds per session, skip means default |
+| R5 | Independent audit — the auditor is never the refiner |
+| R6 | Never change the task's nature — sensitivity or vagueness is not a downgrade |
+| R7 | Intent fidelity — if it reads like a different task, roll back |
+| R8 | Follow the user's language |
+| R9 | Round cap — ≤4, then ship with residual assumptions |
+| R10 | Execute on PASS — a spec without the artifact is a failed turn |
+| R11 | No recursion — every subagent brief carries the anti-load ban |
+| R12 | Silent execution — no process logs, only results |
 
-**R10 is the most frequently broken one**: "the spec is ready, shall I start?" is a failed delivery. Once PASS, the same turn must produce real work.
+**R10 is the most frequently broken one**: "the spec is ready, shall I start?" is a failed delivery.
 
 ---
 
@@ -145,7 +226,8 @@ R1 source supremacy · R2 no scope creep · R3 ask only blocking gaps · R4 ques
 .
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
-├── docs/                        # per-runner integration guides (en, zh-CN)
+├── docs/                        # integrations + chat-app guides (en, zh-CN)
+├── prompts/                     # chat edition, ready to paste
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/
 │   ├── preamble.md              # P1 refiner / P2 auditor / P3 executor preambles
@@ -162,11 +244,11 @@ R1 source supremacy · R2 no scope creep · R3 ask only blocking gaps · R4 ques
 
 ---
 
-## Example output (excerpt)
+## Example output
 
 Input:
 
-```
+```text
 Tidy up the files on my desktop
 ```
 
@@ -194,7 +276,7 @@ Those acceptance lines are the line between "it finished" and "it did it right".
 
 ---
 
-## Anti-patterns (these break the pipeline)
+## Anti-patterns
 
 | Anti-pattern | Correct behaviour |
 | --- | --- |
@@ -210,6 +292,7 @@ Those acceptance lines are the line between "it finished" and "it did it right".
 
 ```bash
 node scripts/validate.mjs .          # checks frontmatter / references / naming rules
+node scripts/check-i18n.mjs          # checks translations against the English structure
 ```
 
 `VALIDATION: PASS` means the bundle can be loaded by a DSH skill catalog as-is.
@@ -217,8 +300,6 @@ node scripts/validate.mjs .          # checks frontmatter / references / naming 
 ---
 
 ## Translations
-
-This README is available in:
 
 | Language | File |
 | --- | --- |
@@ -235,7 +316,7 @@ This README is available in:
 | Русский | [i18n/README.ru.md](i18n/README.ru.md) |
 | हिन्दी | [i18n/README.hi.md](i18n/README.hi.md) |
 
-Translations keep commands, code blocks, file paths and skill identifiers in their original form. If a translation drifts from the English source, the English source wins.
+Translations keep commands, code blocks, file paths and identifiers verbatim. If a translation drifts from the English source, the English source wins.
 
 ---
 

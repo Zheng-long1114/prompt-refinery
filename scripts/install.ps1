@@ -78,10 +78,22 @@ if (-not $VerifyOnly) {
     Write-Host "previous copy backed up to: $bak"
     Copy-Item (Join-Path $Source 'SKILL.md') $target -Force
     Copy-Item (Join-Path $Source 'references') $target -Recurse -Force
+    foreach ($extra in @('prompts', 'docs')) {
+      $p = Join-Path $Source $extra
+      if (Test-Path $p) {
+        $dest = Join-Path $target $extra
+        if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
+        Copy-Item $p $dest -Recurse -Force
+      }
+    }
   } else {
     New-Item -ItemType Directory -Force -Path $target | Out-Null
     Copy-Item (Join-Path $Source 'SKILL.md') $target -Force
     Copy-Item (Join-Path $Source 'references') $target -Recurse -Force
+    foreach ($extra in @('prompts', 'docs')) {
+      $p = Join-Path $Source $extra
+      if (Test-Path $p) { Copy-Item $p (Join-Path $target $extra) -Recurse -Force }
+    }
   }
   Write-Host "installed to = $target"
 } else {

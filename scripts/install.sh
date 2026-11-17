@@ -74,6 +74,12 @@ if [ "$VERIFY_ONLY" -eq 0 ]; then
   cp "$SOURCE/SKILL.md" "$TARGET/SKILL.md"
   rm -rf "$TARGET/references"
   cp -R "$SOURCE/references" "$TARGET/references"
+  for extra in prompts docs; do
+    if [ -d "$SOURCE/$extra" ]; then
+      rm -rf "$TARGET/$extra"
+      cp -R "$SOURCE/$extra" "$TARGET/$extra"
+    fi
+  done
   echo "installed to = $TARGET"
 else
   echo "verify only, target = $TARGET"

@@ -1,18 +1,27 @@
 ---
 name: prompt-refinery
-description: "Universal prompt refinery, load FIRST for any substantial request in any language or topic. Route the raw prompt to a refiner subagent, audit it with a detail scorecard, ask only blocking gaps, loop until exhaustively detailed, then execute. Covers build, fix, write, translate, explain, analyze, design, research, automate and vague one-liners. Exempt pure control commands (停/继续/是), local edits of a prior result, explicit skip, skill questions, trivial facts."
+description: "提示词精炼厂 / Prompt Refinery - load FIRST for any substantial request in any language: route the prompt to a refiner subagent, audit it with a 100-point scorecard, ask only blocking gaps, loop until exhaustively detailed, then execute. Also ships a single-file chat edition for 豆包 / 千问 / Kimi / 元宝 / 文心 / WPS AI / 飞书 / 钉钉. Exempt control commands (停/继续/是), local edits, explicit skip, skill questions."
 user-invocable: true
 ---
 
-# 提示词精炼流水线 · Prompt Refinery
+# 提示词精炼厂 · Prompt Refinery
 
-本 skill 是**一切请求的前置工序**：用户给任何提示词 → 丢给子智能体精炼 → 审计「是否极其详细地覆盖了用户需求」→ 不达标就循环 / 需要用户拍板就一次性追问 → 达标后把定稿交给主智能体，主智能体**立刻开工**。
+> 一句话：**先给规格打分，再花 token 干活。**
+> 用户给任何提示词 → 精炼成可无追问执行的规格 → 独立审计打分 → 不达标就循环 / 需要拍板就一次性追问 → 达标后**同一回合直接交付成品**。
 
-核心信条三条，任何阶段都不许违反：
+本 skill 是一切请求的前置工序。核心信条三条，任何阶段都不许违反：
 
 1. **原文不丢**：用户原话是唯一事实源，精炼是加分辨率，不是换题目。
 2. **只问阻塞**：能从上下文推断的绝不打扰用户；问就一次问完，带选项和默认值。
 3. **达标即执行**：循环存在的唯一目的是产出可无追问执行的规格；一旦 PASS，本回合内直接交付工作成果，不再二次确认。
+
+### 三种用法，按运行环境选
+
+| 环境 | 用法 | 入口 |
+| --- | --- | --- |
+| 技能型 runner（DSH / Claude Code / Codex / Cursor / Windsurf / Cline / Copilot / Gemini CLI / Aider / Continue / opencode） | 本文件 `SKILL.md` 全流程，真子智能体 + 真文件读写 | 装进技能目录，自动触发或 `/prompt-refinery` |
+| 聊天/办公软件（豆包、千问、Kimi、元宝、文心、星火、WPS AI、飞书、钉钉） | **单文件聊天版**，粘进"智能体 / 自定义指令 / 角色设定" | [`prompts/chat-mode.zh-CN.md`](prompts/chat-mode.zh-CN.md)，步骤见 [`docs/chat-apps.zh-CN.md`](docs/chat-apps.zh-CN.md) |
+| 只有本文件、没有子智能体能力 | 降级为自审模式：精炼与审计拆成两遍显式执行，标注 `SELF_REFINED` / `SELF_AUDITED` | 见 §6 降级表 |
 
 ---
 
@@ -290,9 +299,60 @@ REFINE 阶段必须拿回四样东西，缺一样就打回（返回结构见 `re
 
 ---
 
-## 8. 引用文件
+## 8. 聊天/办公软件模式（豆包、千问、Kimi、元宝、文心、星火、WPS AI、飞书、钉钉）
+
+这类软件**没有技能目录、不能派子智能体、不能读写磁盘**，所以 `SKILL.md` 本身装不进去。给它们的是一条**单文件聊天版**，粘一次就能用。
+
+### 8.1 怎么装（三种姿势，按软件能力从上往下选）
+
+| 方式 | 适用 | 具体做法 |
+| --- | --- | --- |
+| **A 建智能体 / 自定义指令**（首选） | 豆包、千问、Kimi、元宝、文心、星火、飞书、钉钉 | 新建智能体 → 名称填「提示词精炼厂」→ 把 `prompts/chat-mode.zh-CN.md` 里分隔线之间的整段粘进"角色设定 / 指令 / 提示词"→ 保存 |
+| **B 每次开场粘贴** | 没有自定义入口的网页版/手机版（如 DeepSeek、WPS AI） | 把提示词存进输入法快捷短语或便签，每次会话开头粘一次 |
+| **C 上传附件 + 一句话触发** | 支持读附件的（Kimi、豆包、千问、元宝） | 把提示词存成 `提示词精炼厂.txt` 上传，再说"按这个文件工作" |
+
+判断标准：**软件里有没有"智能体 / 角色设定 / 自定义指令 / 系统提示词"输入框**。有 → A；没有 → B 或 C。
+
+### 8.2 各家入口（一句话版）
+
+- **豆包**：doubao.com 或电脑版 → 左侧「智能体」→ 创建智能体 → 角色设定粘贴。
+- **千问 / Qwen**：qianwen.com 或桌面版 → 「智能体」→ 创建 → 指令/提示词粘贴。
+- **Kimi**：Kimi+ 智能体提示词框；或上传 txt 让它按文件工作。
+- **腾讯元宝**：我的 → 创建智能体 → 设定粘贴。
+- **文心一言**：创建智能体 → 人设与回复逻辑粘贴。
+- **讯飞星火**：星火智能体 → 角色描述粘贴。
+- **DeepSeek**：无自定义入口，走方式 B。
+- **WPS AI**：文档侧边栏对话开场粘贴，先出规格再让它改文档。
+- **飞书 / 钉钉**：智能伙伴 / AI 助理 → 角色设定粘贴，开场白建议"把你的需求发我，我先出规格再干活"。
+
+完整点击路径、常见坑、验收话术见 [`docs/chat-apps.zh-CN.md`](docs/chat-apps.zh-CN.md)。
+
+### 8.3 聊天版与完整版的差别（必须说清楚，不许虚标能力）
+
+| 能力 | 聊天版 | 完整版（本文件全流程） |
+| --- | --- | --- |
+| 10 区块规格 | ✅ | ✅ |
+| 评分卡 | ✅ 自审，**≤3 轮** | ✅ 独立审计子智能体，**≤4 轮** |
+| 追问 | ✅ 一次 ≤4 问，带默认值 | ✅ 同 |
+| 写文件 / 跑命令 | ❌ 只能输出到对话 | ✅ 落盘、跑测试、看结果 |
+| 审计独立性 | ❌ 自己审自己（有偏差） | ✅ 审计者 ≠ 精炼者 |
+
+所以在聊天软件里要**主动降级**：把"审计"写成显式的自检清单（§7），并在交付末尾说明"这是聊天版，没有独立审计"。
+
+### 8.4 聊天版的三条纪律（否则会退化成普通助手）
+
+1. **不许角色扮演**：开头就写死"不要扮演精炼厂老板，只按流程工作"，否则模型会把"厂"演成一个客服人设。
+2. **不许跳过自审**：聊天版最容易死在"直接开写"。把 `【第三阶段 · 自审】` 与 `【第四阶段 · 执行】` 放在提示词末尾附近，权重更高。
+3. **长输出要分段**：10 区块一次输出常被截断，让它"先给 1–5 区块，我说继续再给 6–10"。
+
+---
+
+## 9. 引用文件
 
 - `references/preamble.md` —— 三套前置词（P1 精炼者 / P2 审计者 / P3 执行者），逐字复制使用。
 - `references/scorecard.md` —— 详细度评分卡、PASS 门槛、"极其详细"的操作定义、PATCH 写法。
 - `references/output-contract.md` —— SPEC 的 10 区块模板、字数与格式约数、返回结构。
 - `references/examples.md` —— 四个完整端到端示例（含实际派发文本与审计卡）。
+- `prompts/chat-mode.zh-CN.md` —— 聊天版单文件提示词（豆包/千问等直接粘贴）。
+- `docs/chat-apps.zh-CN.md` —— 各家软件的安装位置、坑与验收话术。
+- `docs/integrations.zh-CN.md` —— Claude Code / Codex / Cursor / Copilot 等 11 种 runner 的接入步骤。
