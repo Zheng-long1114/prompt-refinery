@@ -112,6 +112,8 @@ The skill is runner-neutral: it needs only three capabilities — **spawn subage
 
 Full step-by-step for each runner: [docs/integrations.md](docs/integrations.md).
 
+**Persistent install** (never lose the skill again — bundle plugin for the whole host, or a committed project copy): [docs/persistent-install.md](docs/persistent-install.md).
+
 ---
 
 ## Chat apps (Doubao, Qwen, Kimi, …)
@@ -227,6 +229,7 @@ Ban 4 is not optional: subagents also see the skill catalog ("load FIRST for any
 ├── README.md                    # this file (English)
 ├── i18n/                        # translations (zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi)
 ├── docs/                        # integrations + chat-app guides (en, zh-CN)
+├── plugin/                      # DSH bundle plugin (persistent install: loads with the host)
 ├── prompts/                     # chat edition, ready to paste
 ├── SKILL.md                     # main flow: triggers / state machine / dispatch / audit / handoff / rules
 ├── references/

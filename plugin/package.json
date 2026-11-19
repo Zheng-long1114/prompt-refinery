@@ -1,0 +1,35 @@
+{
+  "name": "dsh-skill-prompt-refinery",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bundled prompt-refinery skill for DeepSeek Harness: registers the skill from packaged assets so it loads with the host, independent of any skills directory.",
+  "type": "module",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "cordis.patch.yml",
+    "assets"
+  ],
+  "scripts": {
+    "build:assets": "node scripts/build-assets.mjs"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "skill",
+    "prompt-refinery"
+  ]
+}

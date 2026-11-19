@@ -1,0 +1,10 @@
+# dsh-skill-prompt-refinery — bundle patch
+#
+# Registers one more provider in the host skill registry. The provider reads
+# ./assets/prompt-refinery/SKILL.md and exposes it as a model-invocable,
+# user-invocable skill named prompt-refinery (rank 600, bundled source).
+#
+# Assets are generated from the repository root by `node scripts/build-assets.mjs`.
+- insert:
+    - id: skill-prompt-refinery
+      name: 'dsh-skill-prompt-refinery'

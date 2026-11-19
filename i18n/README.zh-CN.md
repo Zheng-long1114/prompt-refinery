@@ -112,6 +112,8 @@ bash scripts/install.sh               # macOS / Linux / WSL
 
 每个 runner 的完整步骤见 [docs/integrations.zh-CN.md](../docs/integrations.zh-CN.md)。
 
+**常装**（技能随宿主启动加载，或跟着项目仓库走，不再怕目录被清理）：[docs/persistent-install.zh-CN.md](docs/persistent-install.zh-CN.md)。
+
 ---
 
 ## 聊天/办公软件（豆包、千问、Kimi…）
@@ -225,6 +227,7 @@ PASS 需要同时满足：**总分 ≥ 85**，且**每一维 ≥ 该维分值的
 ├── README.md                    # 英文主文档
 ├── i18n/                        # 各语言翻译（zh-CN, zh-TW, ja, ko, ar, es, fr, de, pt-BR, ru, hi）
 ├── docs/                        # 接入指南 + 聊天软件指南（en, zh-CN）
+├── plugin/                      # DSH bundle 插件（常装：随宿主启动加载）
 ├── prompts/                     # 聊天版提示词，粘贴即用
 ├── SKILL.md                     # 主流程：触发 / 状态机 / 派发 / 审计 / 交接 / 规则
 ├── references/

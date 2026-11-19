@@ -6,3 +6,5 @@ desktop.ini
 # local installs / backups
 *.bak-*
 node_modules/
+# generated plugin assets (build with: node plugin/scripts/build-assets.mjs)
+plugin/assets/
